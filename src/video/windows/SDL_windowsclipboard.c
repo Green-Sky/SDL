@@ -167,6 +167,12 @@ static int WIN_SetClipboardText(SDL_VideoDevice *_this, const char *mime_type)
     const void *clipboard_data;
     int result = 0;
 
+    // TODO: cache this value
+    unsigned int win_clipboard_format_id = RegisterClipboardFormatA(mime_type);
+    if (win_clipboard_format_id == 0) {
+        return SDL_SetError("Couldn't register clipboard mime-type");
+    }
+
     clipboard_data = _this->clipboard_callback(_this->clipboard_userdata, mime_type, &clipboard_data_size);
     if (clipboard_data && clipboard_data_size > 0) {
         SIZE_T i, size;
@@ -200,7 +206,8 @@ static int WIN_SetClipboardText(SDL_VideoDevice *_this, const char *mime_type)
                 GlobalUnlock(hMem);
             }
 
-            if (!SetClipboardData(TEXT_FORMAT, hMem)) {
+            //if (!SetClipboardData(TEXT_FORMAT, hMem)) {
+            if (!SetClipboardData(win_clipboard_format_id, hMem)) {
                 result = WIN_SetError("Couldn't set clipboard data");
             }
         } else {
