@@ -122,6 +122,7 @@ JOB_SPECS = {
     "ios": JobSpec(name="iOS (CMake & xcode)",                              os=JobOs.MacosLatest,   platform=SdlPlatform.Ios,         artifact="SDL-ios-arm64",          xcode=True, ),
     "tvos": JobSpec(name="tvOS (CMake & xcode)",                            os=JobOs.MacosLatest,   platform=SdlPlatform.Tvos,        artifact="SDL-tvos-arm64",         xcode=True, ),
     "android-cmake": JobSpec(name="Android (CMake)",                        os=JobOs.UbuntuLatest,  platform=SdlPlatform.Android,     artifact="SDL-android-arm64",      android_abi="arm64-v8a", android_arch="aarch64", android_platform=23, ),
+    "android-cmake-arm32": JobSpec(name="Android arm32 (CMake)",            os=JobOs.UbuntuLatest,  platform=SdlPlatform.Android,     artifact="SDL-android-arm32",      android_abi="armeabi-v7a", android_arch="armeabi", android_platform=23, ),
     "android-cmake-lean": JobSpec(name="Android (CMake, lean)",             os=JobOs.UbuntuLatest,  platform=SdlPlatform.Android,     artifact="SDL-lean-android-arm64", android_abi="arm64-v8a", android_arch="aarch64", android_platform=23, lean=True, ),
     "android-mk": JobSpec(name="Android (Android.mk)",                      os=JobOs.UbuntuLatest,  platform=SdlPlatform.Android,     artifact=None,                     no_cmake=True, android_mk=True, ),
     "android-gradle": JobSpec(name="Android (Gradle)",                      os=JobOs.UbuntuLatest,  platform=SdlPlatform.Android,     artifact=None,                     no_cmake=True, android_gradle=True, ),
@@ -523,6 +524,7 @@ def spec_to_job(spec: JobSpec, key: str, trackmem_symbol_names: bool) -> JobDeta
                     "testcontroller-apk",
                     "testmultiaudio-apk",
                     "testsprite-apk",
+                    "testcamera-apk",
                 ]
         case SdlPlatform.Emscripten:
             job.clang_tidy = False  # clang-tidy does not understand -gsource-map
