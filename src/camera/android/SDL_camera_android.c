@@ -116,6 +116,7 @@ typedef void (*pfnAImage_delete)(AImage*);
 typedef media_status_t (*pfnAImage_getTimestamp)(const AImage*, int64_t*);
 typedef media_status_t (*pfnAImage_getNumberOfPlanes)(const AImage*, int32_t*);
 typedef media_status_t (*pfnAImage_getPlaneRowStride)(const AImage*, int, int32_t*);
+typedef media_status_t (*pfnAImage_getPlanePixelStride)(const AImage*, int, int32_t*);
 typedef media_status_t (*pfnAImage_getPlaneData)(const AImage*, int, uint8_t**, int*);
 typedef media_status_t (*pfnAImageReader_acquireNextImage)(AImageReader*, AImage**);
 typedef void (*pfnAImageReader_delete)(AImageReader*);
@@ -126,6 +127,7 @@ static pfnAImage_delete pAImage_delete = NULL;
 static pfnAImage_getTimestamp pAImage_getTimestamp = NULL;
 static pfnAImage_getNumberOfPlanes pAImage_getNumberOfPlanes = NULL;
 static pfnAImage_getPlaneRowStride pAImage_getPlaneRowStride = NULL;
+static pfnAImage_getPlanePixelStride pAImage_getPlanePixelStride = NULL;
 static pfnAImage_getPlaneData pAImage_getPlaneData = NULL;
 static pfnAImageReader_acquireNextImage pAImageReader_acquireNextImage = NULL;
 static pfnAImageReader_delete pAImageReader_delete = NULL;
@@ -268,7 +270,7 @@ static void format_android_to_sdl(Uint32 fmt, SDL_PixelFormat *format, SDL_Color
     }
 
     #if DEBUG_CAMERA
-    //SDL_Log("Unknown format AIMAGE_FORMAT '%d'", fmt);
+    SDL_Log("Unknown format AIMAGE_FORMAT '%d'", fmt);
     #endif
 
     *format = SDL_PIXELFORMAT_UNKNOWN;
@@ -322,6 +324,19 @@ static SDL_CameraFrameResult ANDROIDCAMERA_AcquireFrame(SDL_Camera *device, SDL_
     // !!! FIXME: this currently copies the data to the surface (see FIXME about non-contiguous planar surfaces, but in theory we could just keep this locked until ReleaseFrame...
     int32_t num_planes = 0;
     pAImage_getNumberOfPlanes(image, &num_planes);
+
+    #if DEBUG_CAMERA
+    SDL_Log("CAMERA: NumberOfPlanes: %d", num_planes);
+
+    for (int32_t i_plane = 0; i_plane < num_planes; i_plane++) {
+        int32_t row_stride = 0;
+        int32_t pixel_stride = 0;
+        pAImage_getPlaneRowStride(image, i_plane, &row_stride);
+        pAImage_getPlanePixelStride(image, i_plane, &pixel_stride);
+        SDL_Log("CAMERA: frame plane %d row stride: %d", i_plane, row_stride);
+        SDL_Log("CAMERA: frame plane %d pixel stride: %d", i_plane, pixel_stride);
+    }
+    #endif
 
     if ((num_planes == 3) && (device->spec.format == SDL_PIXELFORMAT_NV12)) {
         num_planes--;   // treat the interleaved planes as one.
@@ -850,6 +865,7 @@ static bool ANDROIDCAMERA_Init(SDL_CameraDriverImpl *impl)
     LOADSYM(libmedia, AImage_getTimestamp);
     LOADSYM(libmedia, AImage_getNumberOfPlanes);
     LOADSYM(libmedia, AImage_getPlaneRowStride);
+    LOADSYM(libmedia, AImage_getPlanePixelStride);
     LOADSYM(libmedia, AImage_getPlaneData);
     LOADSYM(libmedia, AImageReader_acquireNextImage);
     LOADSYM(libmedia, AImageReader_delete);
