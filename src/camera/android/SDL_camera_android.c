@@ -270,7 +270,7 @@ static void format_android_to_sdl(Uint32 fmt, SDL_PixelFormat *format, SDL_Color
     }
 
     #if DEBUG_CAMERA
-    //SDL_Log("Unknown format AIMAGE_FORMAT '%d'", fmt);
+    SDL_Log("Unknown format AIMAGE_FORMAT '%d'", fmt);
     #endif
 
     *format = SDL_PIXELFORMAT_UNKNOWN;
@@ -324,6 +324,19 @@ static SDL_CameraFrameResult ANDROIDCAMERA_AcquireFrame(SDL_Camera *device, SDL_
     // !!! FIXME: this currently copies the data to the surface (see FIXME about non-contiguous planar surfaces, but in theory we could just keep this locked until ReleaseFrame...
     int32_t num_planes = 0;
     pAImage_getNumberOfPlanes(image, &num_planes);
+
+    #if DEBUG_CAMERA
+    SDL_Log("CAMERA: NumberOfPlanes: %d", num_planes);
+
+    for (int32_t i_plane = 0; i_plane < num_planes; i_plane++) {
+        int32_t row_stride = 0;
+        int32_t pixel_stride = 0;
+        pAImage_getPlaneRowStride(image, i_plane, &row_stride);
+        pAImage_getPlanePixelStride(image, i_plane, &pixel_stride);
+        SDL_Log("CAMERA: frame plane %d row stride: %d", i_plane, row_stride);
+        SDL_Log("CAMERA: frame plane %d pixel stride: %d", i_plane, pixel_stride);
+    }
+    #endif
 
     if ((num_planes == 3) && (device->spec.format == SDL_PIXELFORMAT_NV12)) {
         num_planes--;   // treat the interleaved planes as one.

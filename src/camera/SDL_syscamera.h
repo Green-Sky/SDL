@@ -25,7 +25,7 @@
 
 #include "../video/SDL_surface_c.h"
 
-#define DEBUG_CAMERA 0
+#define DEBUG_CAMERA 1
 
 /* Backends should call this as devices are added to the system (such as
    a USB camera being plugged in), and should also be called for
