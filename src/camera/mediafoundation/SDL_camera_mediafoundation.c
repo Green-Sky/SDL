@@ -1011,7 +1011,19 @@ static void MaybeAddDevice(IMFActivate *activation)
             SDL_free(add_data.specs);
             IMFActivate_ShutdownObject(activation);
             IMFMediaSource_Release(source);
+        } else {
+            #if DEBUG_CAMERA
+            SDL_Log("CAMERA: device object activation failed for '%s' '%s'", symlink, name);
+            #endif
         }
+    } else {
+        #if DEBUG_CAMERA
+        if (symlink) {
+            SDL_Log("CAMERA: device with symlink of '%s' has no (friendly)name", symlink);
+        } else if (name) {
+            SDL_Log("CAMERA: device with name of '%s' has no symlink", name);
+        }
+        #endif
     }
 
     SDL_free(name);
