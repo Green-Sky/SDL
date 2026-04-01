@@ -593,6 +593,7 @@ def spec_to_job(spec: JobSpec, key: str, trackmem_symbol_names: bool) -> JobDeta
                     "testcontroller-apk",
                     "testmultiaudio-apk",
                     "testsprite-apk",
+                    "testcamera-apk",
                 ]
 
                 # -fPIC is required after updating NDK from 21 to 28
